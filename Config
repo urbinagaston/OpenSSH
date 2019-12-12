@@ -1,0 +1,50 @@
+OPEN SSH
+
+SSH=Secure shell protocolo de administración remota para controlar y configurar servidores remotos de forma cifrada y autenticada.
+
+sudo apt install openssh-server = Instalación
+sudo nano /etc/ssh/sshd_config = Editar configuración
+Port = Número de puerto a utilizar.
+PasswordAuthentication yes = Habilitar login con usuario y contraseña.
+PasswordAuthentication no = Para login criptográfico.
+PubkeyAuthentication yes = Login criptográfico habilitado.
+PermitRootLogin no = Deshabiliatmos al usuario root.
+LoginGraceTime 30 = Establece el tiempo para introducir la constraseña.
+MaxAuthTries 3 = Número de veces de reintento en contraseña.
+MaxStartups 3 = Número de logins simultáneos desde una ip.
+AllowUsers usuario usuario1= Crea una lista blanca de usuarios.
+DenyUsers usuario usuario1= Lista negra de usuarios.
+AllowGroups/DenyUsers Grupo Grupo1 = Lista negra por grupo.
+/home/usuario/.ssh = Host conocidos y claves públicas.
+sudo /etc/init.d/ssh start = Iniciar servicio.
+sudo /etc/init.d/ssh stop = Detener servicio.
+sudo /etc/init.d/ssh restart = Reiniciar servicio.
+
+
+Criptografía:
+Clave simétrica o de clave compartida = Se utiliza la misma clave para cifrar y descifrar.
+Clave asimétrica = Se crean dos claves, la privada descifra lo cifrado por la pública y al contrario.
+
+
+Para configurar el acceso SSH con clave pública hay que:
+
+1) Generar el par de claves pública/privada.
+ssh-keygen -t rsa = Crear las llaves pública y privada.
+
+2) Copiar la clave pública al servidor.
+scp -P 9022 id_rsa.pub urbina@192.168.0.133:/home/urbina
+
+La clave pública hay que incluirla en el archivo /home/user/.ssh/authorized_keys.
+Si la carpeta .ssh no existe, la creamos antes de copiar, así como el archivo authorized_keys:
+mkdir .ssh
+chmod 700 .ssh
+touch .ssh/authorized_keys
+chmod 600 authorized_keys
+cat id_rsa.pub >> /home/sergio/.ssh/authorized_keys
+rm id_rsa.pub
+
+3) Deshabilitar el acceso al servidor con contraseña.
+PasswordAuthentication No
+
+4) Eliminar la llave id_rsa.pub
+rm id_rsa.pub
