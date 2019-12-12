@@ -21,6 +21,13 @@ sudo /etc/init.d/ssh stop = Detener servicio.
 sudo /etc/init.d/ssh restart = Reiniciar servicio.
 
 
+
+AUTENTICACIÓN
+
+Por usuario y clave.
+Por clave pública.
+
+
 Criptografía:
 Clave simétrica o de clave compartida = Se utiliza la misma clave para cifrar y descifrar.
 Clave asimétrica = Se crean dos claves, la privada descifra lo cifrado por la pública y al contrario.
@@ -52,5 +59,34 @@ rm id_rsa.pub
 5) ssh -p 9022 root@192.168.0.133
 
 
-6) Eliminar la llave id_rsa.pub
-rm id_rsa.pub
+FIREWALL
+
+Esta sentencia ACEPTA hasta 5 conexiones que provengan de la misma IP pública, a
+partir de la sexta conexión lo bloqueamos. Si tenemos varias interfaces de red,
+deberemos usar el «-i» para poner por qué interfaz estamos aplicando esta regla,
+si no ponemos nada se aplicará a todas ellas.
+
+iptables -A INPUT -p tcp --dport 22445 -m connlimit --connlimit-upto 5 --connlimitmask
+32 -j ACCEPT
+
+iptables -A INPUT -j DROP
+
+
+Configurar el módulo recent para mitigar ataques de fuerza bruta en el servicio SSH.
+
+El módulo recent sirve para limitar el número de conexiones por segundo a nivel de IP,
+esto es ideal para protegernos de ataques al puerto SSH porque un atacante probará
+múltiples contraseñas. En el siguiente ejemplo, daremos de alta en una base de datos
+todas las conexiones al puerto TCP 22445 de destino, y daremos de alta el origen de esas
+conexiones (la IP pública de un posible atacante).
+
+iptables -A INPUT -p tcp --dport 22445 -m conntrack --ctstate NEW -m recent --set --
+name ssh --rsource
+
+Posteriormente, chequeamos que en la tabla no haya más de 4 coincidencias en los
+últimos 60 segundos. Si hay más de 4 coincidencias, procedemos a bloquear todas las
+conexiones a partir de ahí.
+
+iptables -A INPUT -p tcp --dport 22445 -m state --state NEW -m recent --rcheck --
+seconds 60 --hitcount 4 --name ssh --rsource -j DROP
+
