@@ -48,3 +48,9 @@ PasswordAuthentication No
 
 4) Eliminar la llave id_rsa.pub
 rm id_rsa.pub
+
+5) ssh -p 9022 root@192.168.0.133
+
+
+4) Eliminar la llave id_rsa.pub
+rm id_rsa.pub
