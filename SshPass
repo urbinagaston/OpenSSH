@@ -1,0 +1,3 @@
+echo 'contraseña' > .sshpassword
+rm .sshpassword
+gpg -d -q .sshpassword.gpg > west; sshpass -f west ssh user@ip
